@@ -3,10 +3,14 @@ package main
 import (
 	"database/sql"
 	_ "embed"
-	"log"
-
-	"github.com/kr/pretty"
+	"encoding/json"
+	"fmt"
 )
+
+type Output struct {
+	Statistics Stats  `json:"statistics"`
+	Cards      []Card `json:"cards"`
+}
 
 func main() {
 	db, err := sql.Open("duckdb", "")
@@ -17,8 +21,12 @@ func main() {
 	prepDB(db, rawLines)
 
 	stats := GetStats(db)
-	log.Printf("%# v\n", pretty.Formatter(stats))
-
 	cards := AssignCards(db, stats)
-	log.Printf("%# v\n", pretty.Formatter(cards))
+
+	out := Output{
+		stats, cards,
+	}
+
+	outjson, _ := json.Marshal(out)
+	fmt.Println(string(outjson))
 }
