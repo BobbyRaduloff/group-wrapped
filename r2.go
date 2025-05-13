@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"log"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -18,7 +19,7 @@ func DumpToR2(filename string, data []byte) {
 	bucket := os.Getenv("R2_BUCKET")
 
 	// Configure R2 client
-	cfg, _:= config.LoadDefaultConfig(context.Background(),
+	cfg, err := config.LoadDefaultConfig(context.Background(),
 		config.WithRegion("auto"),
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
 			access_key,
@@ -26,6 +27,7 @@ func DumpToR2(filename string, data []byte) {
 			"",
 		)),
 	)
+	log.Println(err)
 
 	// Create S3 client with R2-specific endpoint
 	s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
@@ -33,10 +35,11 @@ func DumpToR2(filename string, data []byte) {
 	})
 
 	ct := "text/plain"
-	 s3Client.PutObject(context.Background(), &s3.PutObjectInput{
+	_, err = s3Client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket: &bucket,
 		Key:    &filename,
 		Body:   bytes.NewReader(data),
 		ContentType: &ct,
 	})
+	log.Println(err)
 }
