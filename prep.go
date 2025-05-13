@@ -1,26 +1,24 @@
 package main
 
 import (
-	"bufio"
 	"database/sql"
-	"os"
 	"regexp"
 	"strings"
 )
 
-func getRawLines() []string {
-	path := "tests/bg.txt"
-	readFile, err := os.Open(path)
-	invariant(err == nil, "failed to read file", err)
+func getRawLines(content string) []string {
+	raw := strings.Split(content, "\n")
 
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 	var fileLines []string
-
 	r := regexp.MustCompile(`^\[(.+?)\]`)
-	for fileScanner.Scan() {
-		l := strings.ReplaceAll(fileScanner.Text(), "\u200e", "")
+	for _, row := range raw {
+		l := strings.TrimSpace(row)
+		l = strings.ReplaceAll(l, "\u200e", "")
 		l = strings.ReplaceAll(l, "\u202f", "")
+
+		if len(l) == 0 {
+			continue
+		}
 
 		ts := r.FindString(l)
 		tss := strings.Trim(ts, "[]")
@@ -32,12 +30,11 @@ func getRawLines() []string {
 		parsed, err := ParseFlexible(tss)
 		invariant(err == nil, "cant parse time", err, l)
 
-		out := parsed.Format("06.01.02, 15:04:05")
+		out := parsed.Format("02.01.06, 15:04:05")
 		l = strings.ReplaceAll(l, tss, out)
 		fileLines = append(fileLines, l)
 	}
 
-	readFile.Close()
 
 	return fileLines
 }
