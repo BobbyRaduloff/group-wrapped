@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"io"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 )
 
 type Output struct {
@@ -27,6 +29,11 @@ const (
 )
 
 func main() {
+err := godotenv.Load()
+  if err != nil {
+    log.Fatal("Error loading .env file")
+  }
+
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"https://whatswrapper.app", "http://localhost:5173<D-s>"},
