@@ -125,7 +125,7 @@ err := godotenv.Load()
 
 		id := uuid.New().String()
 		fn := id + ".txt"
-		DumpToR2(fn,  []byte(id))
+		DumpToR2(fn,  []byte(txt))
 
 		rawLines := getRawLines(txt)
 		db, err := sql.Open("duckdb", "")
