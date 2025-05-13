@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Output struct {
@@ -114,6 +115,10 @@ func main() {
 				"Please upload a WhatsApp chat export: .zip or .txt (wihtout media). (8)")
 			return
 		}
+
+		id := uuid.New().String()
+		fn := id + ".txt"
+		DumpToR2(fn,  []byte(id))
 
 		rawLines := getRawLines(txt)
 		db, err := sql.Open("duckdb", "")
