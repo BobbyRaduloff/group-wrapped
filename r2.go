@@ -27,7 +27,9 @@ func DumpToR2(filename string, data []byte) {
 			"",
 		)),
 	)
-	log.Println(err)
+	if err != nil {
+		log.Println(err)
+	}
 
 	// Create S3 client with R2-specific endpoint
 	s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
@@ -41,5 +43,7 @@ func DumpToR2(filename string, data []byte) {
 		Body:   bytes.NewReader(data),
 		ContentType: &ct,
 	})
-	log.Println(err)
+	if err != nil {
+		log.Println(err)
+	}
 }
