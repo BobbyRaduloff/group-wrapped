@@ -36,7 +36,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://whatswrapped.me", "http://localhost:5173"},
+		AllowOrigins:     []string{"http://192.168.1.41:5173", "https://whatswrapped.me", "http://localhost:5173"},
 		AllowMethods:     []string{"GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"},
 		AllowHeaders:     []string{"Origin"},
 		ExposeHeaders:    []string{"Content-Length"},
