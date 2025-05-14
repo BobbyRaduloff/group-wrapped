@@ -24,19 +24,19 @@ type Output struct {
 }
 
 const (
-	maxUpload       = 1 << 20  // 5 MB  compressed
+	maxUpload       = 1 << 20 // 5 MB  compressed
 	maxUncompressed = 3 << 20 // 10 MB uncompressed
 )
 
 func main() {
-err := godotenv.Load()
-  if err != nil {
-    log.Fatal("Error loading .env file")
-  }
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://whatswrapper.app", "http://localhost:5173<D-s>"},
+		AllowOrigins:     []string{"https://whatswrapped.me", "http://localhost:5173"},
 		AllowMethods:     []string{"GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"},
 		AllowHeaders:     []string{"Origin"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -82,7 +82,6 @@ err := godotenv.Load()
 				return
 			}
 
-
 			if len(zr.File) < 1 {
 				c.JSON(http.StatusBadRequest,
 					"Please upload a WhatsApp chat export: .zip or .txt (wihtout media). (3)")
@@ -125,7 +124,7 @@ err := godotenv.Load()
 
 		id := uuid.New().String()
 		fn := id + ".txt"
-		DumpToR2(fn,  []byte(txt))
+		DumpToR2(fn, []byte(txt))
 
 		rawLines := getRawLines(txt)
 		db, err := sql.Open("duckdb", "")
