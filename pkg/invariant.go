@@ -1,8 +1,8 @@
-package main
+package pkg
 
 import "fmt"
 
-func invariant(cond bool, messages ...any) {
+func Invariant(cond bool, messages ...any) {
 	if !cond {
 		panic(fmt.Sprintf("invariant failed: %v", messages))
 	}

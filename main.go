@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"database/sql"
 	_ "embed"
+	"group-wrapped/pkg"
 	"io"
 	"log"
 	"net/http"
@@ -19,8 +20,8 @@ import (
 )
 
 type Output struct {
-	Statistics Stats  `json:"statistics"`
-	Cards      []Card `json:"cards"`
+	Statistics pkg.Stats  `json:"statistics"`
+	Cards      []pkg.Card `json:"cards"`
 }
 
 const (
@@ -124,16 +125,16 @@ func main() {
 
 		id := uuid.New().String()
 		fn := id + ".txt"
-		DumpToR2(fn, []byte(txt))
+		pkg.DumpToR2(fn, []byte(txt))
 
-		rawLines := getRawLines(txt)
+		rawLines := pkg.GetRawLines(txt)
 		db, err := sql.Open("duckdb", "")
-		invariant(err == nil, "failed to connect to duckdb", err)
+		pkg.Invariant(err == nil, "failed to connect to duckdb", err)
 		defer db.Close()
-		prepDB(db, rawLines)
+		pkg.PrepDB(db, rawLines)
 
-		stats := GetStats(db)
-		cards := AssignCards(db, stats)
+		stats := pkg.GetStats(db)
+		cards := pkg.AssignCards(db, stats)
 
 		out := Output{
 			stats, cards,

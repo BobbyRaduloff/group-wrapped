@@ -1,10 +1,11 @@
-package main
+package pkg
 
 import (
 	"database/sql"
 	"math"
 	"math/rand"
 	"slices"
+	"strings"
 )
 
 // grandma: most stickers
@@ -32,6 +33,10 @@ type Card struct {
 func AssignCards(db *sql.DB, stats Stats) []Card {
 	cards := make(map[string]*Card)
 
+	if len(stats.MessagesPerPerson) <= 0 {
+		return []Card{}
+	}
+
 	largestStickerSender := ""
 	largestStickerCount := 0
 	for _, x := range stats.StickersPerPerson {
@@ -41,6 +46,7 @@ func AssignCards(db *sql.DB, stats Stats) []Card {
 		}
 	}
 	if largestStickerCount > 0 {
+		largestStickerSender = strings.Replace(largestStickerSender, "- ", "", 1)
 		cards["GRANDMA"] = &Card{
 			largestStickerSender,
 			"GRANDMA",
@@ -76,7 +82,7 @@ func AssignCards(db *sql.DB, stats Stats) []Card {
 	}
 
 	cards["LURKER"] = &Card{
-		stats.MessagesPerPerson[len(stats.MessagesPerPerson)-1].Sender,
+		strings.Replace(stats.MessagesPerPerson[len(stats.MessagesPerPerson)-1].Sender, "- ", "", 1),
 		"LURKER",
 		stats.MessagesPerPerson[len(stats.MessagesPerPerson)-1].Count,
 	}
@@ -106,6 +112,7 @@ func AssignCards(db *sql.DB, stats Stats) []Card {
 	}
 
 	if spammerCount > 0 {
+		spammer = strings.Replace(spammer, "- ", "", 1)
 		cards["SPAMMER"] = &Card{
 			spammer,
 			"SPAMMER",
@@ -114,7 +121,7 @@ func AssignCards(db *sql.DB, stats Stats) []Card {
 	}
 
 	cards["CORE"] = &Card{
-		stats.MessagesPerPerson[0].Sender,
+		strings.Replace(stats.MessagesPerPerson[0].Sender, "- ", "", 1),
 		"CORE",
 		stats.MessagesPerPerson[0].Count,
 	}
@@ -150,7 +157,7 @@ func AssignCards(db *sql.DB, stats Stats) []Card {
 			if chance == 1337 {
 				usedCards = append(usedCards, "TIMECHEESE")
 				ret = append(ret, Card{
-					p.Sender,
+					strings.Replace(p.Sender, "- ", "", 1),
 					"TIMECHEESE",
 					0,
 				})

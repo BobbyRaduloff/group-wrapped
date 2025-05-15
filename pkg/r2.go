@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"bytes"
@@ -38,9 +38,9 @@ func DumpToR2(filename string, data []byte) {
 
 	ct := "text/plain"
 	_, err = s3Client.PutObject(context.Background(), &s3.PutObjectInput{
-		Bucket: &bucket,
-		Key:    &filename,
-		Body:   bytes.NewReader(data),
+		Bucket:      &bucket,
+		Key:         &filename,
+		Body:        bytes.NewReader(data),
 		ContentType: &ct,
 	})
 	if err != nil {

@@ -1,8 +1,9 @@
-package main
+package pkg
 
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	_ "embed"
@@ -66,6 +67,7 @@ func messagesPerPerson(db *sql.DB) ([]MessagePerPerson, error) {
 		if err := rows.Scan(&m.Sender, &m.Count); err != nil {
 			return nil, fmt.Errorf("failed to scan messages per person: %w", err)
 		}
+		m.Sender = strings.Replace(m.Sender, "- ", "", 1)
 		ret = append(ret, m)
 	}
 
@@ -124,6 +126,8 @@ func mediaCounter(db *sql.DB, media string) ([]MediaCount, error) {
 		if err := rows.Scan(&m.Sender, &m.Count); err != nil {
 			return nil, fmt.Errorf("failed to scan media counter: %w", err)
 		}
+
+		m.Sender = strings.Replace(m.Sender, "- ", "", 1)
 		ret = append(ret, m)
 	}
 
@@ -158,6 +162,9 @@ func coupleFinder(db *sql.DB) (Couple, error) {
 	if err := db.QueryRow(CoupleQuery).Scan(&person1, &person2, &count); err != nil {
 		return Couple{}, fmt.Errorf("failed to find couple: %w", err)
 	}
+
+	person2 = strings.Replace(person2, "- ", "", 1)
+	person1 = strings.Replace(person1, "- ", "", 1)
 	return Couple{
 		person1,
 		person2,
@@ -189,10 +196,15 @@ func longestConvo(db *sql.DB) (LongestConversation, error) {
 		return LongestConversation{}, fmt.Errorf("cannot parse duration: %w", err)
 	}
 
+	parts := participants.Get()
+	for i, p := range parts {
+		parts[i] = strings.Replace(p, "- ", "", 1)
+	}
+
 	return LongestConversation{
 		start,
 		int(dur.Minutes()),
-		participants.Get(),
+		parts,
 	}, nil
 }
 
@@ -205,6 +217,8 @@ func jesterFind(db *sql.DB) (string, int, error) {
 	if err := db.QueryRow(JesterQuery).Scan(&name, &count); err != nil {
 		return "", 0, fmt.Errorf("failed to get jester: %w", err)
 	}
+
+	name = strings.Replace(name, "- ", "", 1)
 	return name, count, nil
 }
 
@@ -217,6 +231,8 @@ func convoStarter(db *sql.DB) (string, int, error) {
 	if err := db.QueryRow(StarterQuery).Scan(&name, &count); err != nil {
 		return "", 0, fmt.Errorf("failed to get conversation starter: %w", err)
 	}
+
+	name = strings.Replace(name, "- ", "", 1)
 	return name, count, nil
 }
 
@@ -229,6 +245,8 @@ func averageYPerHey(db *sql.DB) (string, float64, error) {
 	if err := db.QueryRow(HeyQuery).Scan(&name, &avg); err != nil {
 		return "", 0, fmt.Errorf("failed to count heys: %w", err)
 	}
+
+	name = strings.Replace(name, "- ", "", 1)
 	return name, avg, nil
 }
 
@@ -240,6 +258,8 @@ func botFinder(db *sql.DB) (string, float64, error) {
 	if err := db.QueryRow(BotQuery).Scan(&name, &avg); err != nil {
 		return "", 0, fmt.Errorf("failed to count avg words per mesage: %w", err)
 	}
+
+	name = strings.Replace(name, "- ", "", 1)
 	return name, avg, nil
 }
 
@@ -251,5 +271,7 @@ func openerFinder(db *sql.DB) (string, int, error) {
 	if err := db.QueryRow(OpenerQuery).Scan(&name, &count); err != nil {
 		return "", 0, fmt.Errorf("failed to get opener: %w", err)
 	}
+
+	name = strings.Replace(name, "- ", "", 1)
 	return name, count, nil
 }
