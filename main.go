@@ -193,6 +193,7 @@ func main() {
 
 		defer f.Close()
 	})
+	c.Start()
 
 	r.Run()
 }
