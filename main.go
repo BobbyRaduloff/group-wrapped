@@ -59,11 +59,11 @@ func main() {
 
 		data, err := os.ReadFile("chats.txt")
 		if err != nil {
-			c.String(200, "%d", 450000)
+			c.Data(200, "text/plain", []byte(data))
 			return
 		}
 
-		c.String(200, "%d", string(data))
+		c.Data(200, "text/plain", []byte(data))
 	})
 
 	r.POST("/", func(c *gin.Context) {
