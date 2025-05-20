@@ -5,18 +5,24 @@ import (
 	"bytes"
 	"database/sql"
 	_ "embed"
+	"fmt"
 	"group-wrapped/pkg"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
+	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron/v3"
 )
 
 type Output struct {
@@ -28,6 +34,8 @@ const (
 	maxUpload       = 1 << 20 // 5 MB  compressed
 	maxUncompressed = 3 << 20 // 10 MB uncompressed
 )
+
+var dataMu sync.Mutex
 
 func main() {
 	err := godotenv.Load()
@@ -44,6 +52,19 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	r.GET("/chats", func(c *gin.Context) {
+		dataMu.Lock()
+		defer dataMu.Unlock()
+
+		data, err := os.ReadFile("chats.txt")
+		if err != nil {
+			c.String(200, "%d", 450000)
+			return
+		}
+
+		c.String(200, "%d", data)
+	})
 
 	r.POST("/", func(c *gin.Context) {
 		upFile, hdr, err := c.Request.FormFile("file")
@@ -141,6 +162,36 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, out)
+	})
+
+	c := cron.New()
+
+	c.AddFunc("*/5 * * * *", func() {
+		dataMu.Lock()
+		defer dataMu.Unlock()
+
+		read, err := os.ReadFile("chats.txt")
+		if err != nil {
+			return
+		}
+
+		readParsed, err := strconv.Atoi(string(read))
+		if err != nil {
+			return
+		}
+
+		readParsed += rand.Intn(200)
+
+		f, err := os.OpenFile("notes.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+		if err != nil {
+			return
+		}
+
+		f.Truncate(0)
+		f.Seek(0, 0)
+		fmt.Fprintf(f, "%d", readParsed)
+
+		defer f.Close()
 	})
 
 	r.Run()
