@@ -63,7 +63,7 @@ func main() {
 			return
 		}
 
-		c.String(200, "%d", data)
+		c.String(200, "%d", string(data))
 	})
 
 	r.POST("/", func(c *gin.Context) {
