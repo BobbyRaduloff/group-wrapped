@@ -182,7 +182,7 @@ func main() {
 
 		readParsed += rand.Intn(200)
 
-		f, err := os.OpenFile("notes.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+		f, err := os.OpenFile("chats.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 		if err != nil {
 			return
 		}
